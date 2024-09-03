@@ -15,13 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   socket.on('log', (data) => {
-    logEvent(data.msg);
+    logEvents(data.msg);
   });
 
   socket.on('move', (data) => {
     cells[data.index].textContent = data.player_marker;
     currentPlayer = data.next_player;
-    //logEvent(`${data.player_marker} marked cell ${data.index}`);
+    //logEvents(`${data.player_marker} marked cell ${data.index}`);
     checkGameStatus();
   });
 
@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
     player_marker = data.marker;
     room = data.room;
     username = data.username;
+  })
+
+  socket.on('on_win', (data) => {
+    logEvent(data.msg)
   })
 
   cells.forEach(cell => {
@@ -53,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (player_marker === currentPlayer) {
       socket.emit('move', { index, player_marker, room });
     } else {
-      //logEvent("It's not your turn!");
+      //logEvents("It's not your turn!");
     }
   }
 
@@ -71,9 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
     winCombinations.forEach(combination => {
       const [a, b, c] = combination;
       if (cells[a].textContent && cells[a].textContent === cells[b].textContent && cells[a].textContent === cells[c].textContent) {
+        winner = cells[a].textContent
         console.log(`Winner detected: ${winner}`);
         gameActive = false;
-        socket.emit('win', { username, room });
+        socket.emit('win', { winner, room });
       }
     });
 
@@ -83,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
       socket.emit('draw', { room });
     }
   }
-  const logEvent = (msgs) => {
+  const logEvents = (msgs) => {
     document.getElementById('game-log-list').innerHTML = '';
     if (msgs === undefined || msgs.length === 0) return
     msgs.forEach((msg) => {
@@ -94,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
     })
   }
 
-  const logOneEvent = (msg) => {
+  const logEvent = (msg) => {
       const p = document.createElement('li');
       p.textContent = msg;
       document.getElementById('game-log-list').appendChild(p);

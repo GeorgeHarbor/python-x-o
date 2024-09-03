@@ -83,7 +83,7 @@ def create_room():
     session['room'] = game_id
     session['player_marker'] = 'X'
 
-    games[game_id] = {'players': [{'username': session['username'], 'marker': session['player_marker']}], 'logs': [] }
+    games[game_id] = {'players': [{'username': session['username'], 'marker': session['player_marker']}], 'logs': [], 'winner': None }
     print(games)
 
     return redirect(url_for('.handle_join_room', room=game_id, player_marker=session['player_marker']))

@@ -4,3 +4,7 @@ ul {
 li {
   border-bottom: 2px solid #e7e7e7;
 }
+
+li span{
+  color: white;
+}

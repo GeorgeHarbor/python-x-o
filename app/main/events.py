@@ -2,6 +2,8 @@ from . import socketio
 from flask_socketio import join_room, emit
 from flask import session
 from .utils import handle_game_log_insert
+from .db import get_db_connection
+from .storage import games
 
 @socketio.on('join_room_event')
 def handle_join_room_event():
@@ -22,8 +24,29 @@ def on_move(data):
     next_player = 'O' if current_player == 'X' else 'X'
 
     handle_game_log_insert(f'{username} has moved to index {data["index"]}', room)
-    
+
     emit('move', {'index': data['index'], 'player_marker': current_player, 'next_player': next_player}, to=room)
+
+
+@socketio.on('win')
+def handle_win(data):
+    room = data['room']
+    if games[room]['winner'] is not None:
+        return
+
+    winner = None
+    players = games[room]['players']
+    for player in players:
+        if player['marker'] == data['winner']:
+            winner = player['username']
+            break
+
+    games[room]['winner'] = winner
+    with get_db_connection() as conn:
+        conn.execute("UPDATE user SET wins = wins + 1 WHERE username = ?", (winner,))
+        conn.commit()
+
+    emit('on_win', {'msg': f"{winner} has won"}, to=room)
 
 
 
