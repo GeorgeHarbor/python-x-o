@@ -43,10 +43,27 @@ def handle_win(data):
 
     games[room]['winner'] = winner
     with get_db_connection() as conn:
-        conn.execute("UPDATE user SET wins = wins + 1 WHERE username = ?", (winner,))
+        conn.execute("UPDATE user SET wins = wins + 2 WHERE username = ?", (winner,))
         conn.commit()
 
     emit('on_win', {'msg': f"{winner} has won"}, to=room)
+
+
+@socketio.on('draw')
+def handle_draw(data):
+    room = data.get('room')
+    players = games[room]['players']
+
+    usernames = [player['username'] for player in players]
+
+    if len(usernames) == 0:
+        return
+
+    with get_db_connection() as conn:
+        conn.execute("UPDATE user SET wins = wins + 1 WHERE username in (?, ?)", (usernames[0], usernames[1],))
+        conn.commit()
+
+
 
 
 

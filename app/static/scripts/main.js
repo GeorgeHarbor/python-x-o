@@ -44,10 +44,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  //resetButton.addEventListener('click', () => {
-  //  socket.emit('reset', { room });
-  //});
-  //
+  resetButton.addEventListener('click', () => {
+    socket.emit('draw', { room });
+  });
+
   //leaveButton.addEventListener('click', () => {
   //  socket.emit('leave', { room });
   //  window.location.href = "{{ url_for('home') }}"; 

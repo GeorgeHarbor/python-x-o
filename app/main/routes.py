@@ -93,6 +93,8 @@ def player_join_room():
     room_number = request.form.get('room_number')
     session['room'] = room_number
     session['player_marker'] = 'O'
+
+    games[room_number]['players'].append({'username': session['username'], 'marker': session['player_marker']})
     
     return redirect(url_for('.handle_join_room', room=room_number))
 
