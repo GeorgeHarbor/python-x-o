@@ -19,8 +19,14 @@ def handle_join_room_event():
 @socketio.on('move')
 def on_move(data):
     room = session.get('room')
-    current_player = session.get('player_marker')
+    current_player = None
     username = session.get('username')
+
+    for players in games[room]['players']:
+        if players['username'] == username:
+            current_player = players['marker']
+            break
+
     next_player = 'O' if current_player == 'X' else 'X'
 
     handle_game_log_insert(f'{username} has moved to index {data["index"]}', room)
@@ -71,24 +77,25 @@ def on_leave(data):
     leave_room(room)
     emit('player_left', {'msg': f'{username} has left the room.'}, to=room)
 
+@socketio.on('reset')
+def on_reset(data):
+    room = data['room']
+    games[room]['winner'] = None
+
+    for player in games[room]['players']:
+        player['marker'] = 'X' if player['marker'] == 'O' else 'O'
+
+    games[room]['logs'] = []
+
+    emit('on_reset', {'msg': 'The game has been reset.'}, to=room)
+
 
 @socketio.on('connect')
 def handle_connect():
-    # Example: Check if the user is authenticated
     if 'username' in session:
         username = session['username']
         marker = session['player_marker']
         room = session.get('room')
         print(f'{username} connected')
         
-        # Emit a message back to the client to confirm connection
         emit('connect_response', {'username': username, 'marker': marker, 'room': room})
-    else:
-        # If the user is not authenticated, disconnect the client
-        print('Unauthenticated connection attempt, disconnecting...')
-        handle_disconnect()
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    # Handle any cleanup or logging when the user disconnects
-    print('Client disconnected')

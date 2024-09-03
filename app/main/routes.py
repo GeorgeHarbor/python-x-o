@@ -8,9 +8,6 @@ from .utils import check_user
 from .storage import games
 import uuid
 
-
-
-
 @main.route('/')
 def index():
     if 'username' in session:
@@ -19,13 +16,6 @@ def index():
             users = conn.execute("SELECT * FROM user  where wins > 0 ORDER BY wins DESC").fetchall()
         return render_template('index.html', username=session['username'], users=users)
     return redirect(url_for('.login'))
-
-
-'''
-
-User management routes
-
-'''
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
@@ -70,11 +60,6 @@ def logout():
     session.pop('player_marker', None)  
     flash('You have been logged out.', 'info')
     return redirect(url_for('.login'))
-
-'''
-
-
-'''
 
 @main.route('/create_room')
 def create_room():

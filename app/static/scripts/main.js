@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
   let room = null;
   let player_marker = null;
-  let username = null
   let gameActive = true;
   let currentPlayer = 'X';
 
@@ -21,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
   socket.on('move', (data) => {
     cells[data.index].textContent = data.player_marker;
     currentPlayer = data.next_player;
-    //logEvents(`${data.player_marker} marked cell ${data.index}`);
     checkGameStatus();
   });
 
@@ -38,6 +36,13 @@ document.addEventListener('DOMContentLoaded', function() {
   socket.on('player_left', (data) => {
     logEvent(data.msg)
     gameActive = false
+  })
+
+  socket.on('on_reset', (data) => {
+    player_marker = player_marker === 'X' ? 'O' : 'X'
+    document.getElementById('marker').innerHTML = player_marker;
+    logEvent(data.msg)
+    resetGameState()
   })
 
   cells.forEach(cell => {
@@ -105,10 +110,18 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   const logEvent = (msg) => {
-      const p = document.createElement('li');
-      p.textContent = msg;
-      document.getElementById('game-log-list').appendChild(p);
-      document.getElementById('game-log-list').scrollTop = document.getElementById('game-log').scrollHeight;
+    const p = document.createElement('li');
+    p.textContent = msg;
+    document.getElementById('game-log-list').appendChild(p);
+    document.getElementById('game-log-list').scrollTop = document.getElementById('game-log').scrollHeight;
+  }
+
+  function resetGameState() {
+    cells.forEach(cell => {
+      cell.textContent = '';
+    });
+    currentPlayer = 'X'; 
+    gameActive = true;
   }
 
 })
