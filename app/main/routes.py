@@ -1,8 +1,13 @@
 from flask import session, render_template, redirect, url_for, request, flash
 import sqlite3
+from flask_socketio import emit, join_room
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import main
 from .db import get_db_connection
+from .utils import check_user
+from .storage import games
+import uuid
+
 
 
 
@@ -11,7 +16,7 @@ def index():
     if 'username' in session:
         users = []
         with get_db_connection() as conn:
-            users = conn.execute("SELECT * FROM user ORDER BY wins DESC").fetchall()
+            users = conn.execute("SELECT * FROM user  where wins > 0 ORDER BY wins DESC").fetchall()
         return render_template('index.html', username=session['username'], users=users)
     return redirect(url_for('.login'))
 
@@ -70,3 +75,30 @@ def logout():
 
 
 '''
+
+@main.route('/create_room')
+def create_room():
+    check_user()
+    game_id = str(uuid.uuid4())
+    session['room'] = game_id
+    session['player_marker'] = 'X'
+
+    games[game_id] = {'players': [{'username': session['username'], 'marker': session['player_marker']}], 'logs': [] }
+    print(games)
+
+    return redirect(url_for('.handle_join_room', room=game_id, player_marker=session['player_marker']))
+
+@main.route('/player_join_room', methods = ['POST'])
+def player_join_room():
+    room_number = request.form.get('room_number')
+    session['room'] = room_number
+    session['player_marker'] = 'O'
+    
+    return redirect(url_for('.handle_join_room', room=room_number))
+
+
+@main.route('/join_room')
+def handle_join_room():
+    check_user()
+    return render_template('room.html', room=session['room'], player_marker=session['player_marker'])
+

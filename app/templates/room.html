@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Tic-Tac-Toe Game - Room {{ room }}</h2>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="alert alert-primary text-center">
+        You're: <strong>{{ session['player_marker'] }}</strong>
+      </div>
+      <div id="game-board" class="d-flex flex-wrap justify-content-center" style="max-width: 300px;">
+        {% for i in range(9) %}
+        <div class="cell border border-secondary text-center" style="width: 33.33%; height: 100px; line-height: 100px; cursor: pointer;" data-cell-index="{{ i }}"></div>
+        {% endfor %}
+      </div>
+      <button id="game-reset" class="btn btn-primary mt-3">Reset Game</button>
+      <button id="leave-game" class="btn btn-danger mt-3 ml-2">Leave Game</button>
+    </div>
+    <div class="col-md-4">
+      <h4 class="text-center">Game Log</h4>
+      <div id="game-log" class="border rounded p-2 bg-light" style="height: 400px; overflow-y: scroll;">
+        <ul id="game-log-list" style="list-style-type: none"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='scripts/main.js') }}"></script>
+{% endblock %}

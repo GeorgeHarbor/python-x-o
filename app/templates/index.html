@@ -4,14 +4,14 @@
 <div class="d-flex justify-content-between" style="gap: 2rem;">
         <div class="flex-grow-1 me-3">
             <h1 class="text-center my-3">Welcome, {{ username }}!</h1>
-            <a href="{{ static }}" class="btn btn-primary mb-3">Create a Room</a>
-            <form action="{{ static }}" method="POST" class="mb-3">
+            <a href="{{ url_for('.create_room') }}" class="btn btn-primary mb-3">Create a Room</a>
+            <form action="{{ url_for('.player_join_room') }}" method="POST" class="mb-3">
                 <div class="input-group mb-3">
                     <input type="text" name="room_number" class="form-control" placeholder="Enter Room Number" aria-label="Room Number" required>
                     <button class="btn btn-secondary" type="submit">Join Room</button>
                 </div>
             </form>
-            <a href="{{ static }}" class="btn btn-danger">Logout</a>
+            <a href="{{ url_for('.logout') }}" class="btn btn-danger">Logout</a>
         </div>
         <div class="leaderboard border rounded p-3" style="max-height: 400px; overflow-y: auto;">
             <h2 class="text-center">Leaderboard</h2>

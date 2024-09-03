@@ -1,22 +1,19 @@
 from flask import Flask
-from flask_socketio import SocketIO
-
-
-socketio = SocketIO()
+from .main import socketio, main as main_blueprint
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = 'mojkljuc'
 
-    from .main import main as main_blueprint
+    # Register the main blueprint
     app.register_blueprint(main_blueprint)
 
+    # Initialize SocketIO with the Flask app
     socketio.init_app(app)
 
+    # Initialize the database within the app context
     with app.app_context():
-        from app.main.db import init_db
+        from .main.db import init_db
         init_db()
 
     return app
-
-
