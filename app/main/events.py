@@ -16,10 +16,12 @@ def handle_join_room_event():
 
 @socketio.on('move')
 def on_move(data):
-    print(data)
     room = session.get('room')
     current_player = session.get('player_marker')
+    username = session.get('username')
     next_player = 'O' if current_player == 'X' else 'X'
+
+    handle_game_log_insert(f'{username} has moved to index {data["index"]}', room)
     
     emit('move', {'index': data['index'], 'player_marker': current_player, 'next_player': next_player}, to=room)
 
