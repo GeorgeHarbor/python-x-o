@@ -1,5 +1,5 @@
 from . import socketio
-from flask_socketio import join_room, emit
+from flask_socketio import join_room, emit, leave_room
 from flask import session
 from .utils import handle_game_log_insert
 from .db import get_db_connection
@@ -64,7 +64,12 @@ def handle_draw(data):
         conn.commit()
 
 
-
+@socketio.on('leave')
+def on_leave(data):
+    username = session.get('username')
+    room = data['room']
+    leave_room(room)
+    emit('player_left', {'msg': f'{username} has left the room.'}, to=room)
 
 
 @socketio.on('connect')

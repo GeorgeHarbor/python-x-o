@@ -35,6 +35,11 @@ document.addEventListener('DOMContentLoaded', function() {
     logEvent(data.msg)
   })
 
+  socket.on('player_left', (data) => {
+    logEvent(data.msg)
+    gameActive = false
+  })
+
   cells.forEach(cell => {
     cell.addEventListener('click', () => {
       if (gameActive && cell.textContent.trim() === '') {
@@ -45,19 +50,19 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   resetButton.addEventListener('click', () => {
-    socket.emit('draw', { room });
+    socket.emit('reset', { room });
   });
 
-  //leaveButton.addEventListener('click', () => {
-  //  socket.emit('leave', { room });
-  //  window.location.href = "{{ url_for('home') }}"; 
-  //});
+  leaveButton.addEventListener('click', () => {
+    socket.emit('leave', { room });
+    window.location.href = "/"; 
+  });
 
   function makeMove(index) {
     if (player_marker === currentPlayer) {
       socket.emit('move', { index, player_marker, room });
     } else {
-      //logEvents("It's not your turn!");
+      logEvent("It's not your turn!");
     }
   }
 
